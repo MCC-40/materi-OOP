@@ -79,8 +79,8 @@ public class Process {
                         View.emptyBasket();
                         break;
                     }
-                    View.showTransaction(basket);
-                    stillBuying = false;
+                    stillBuying = processChange(View.showTransaction(basket), sc.nextInt());
+                    System.out.println("\n");
                     break;
                 case 5:
                     stillBuying = false;
@@ -89,6 +89,16 @@ public class Process {
                     View.optionNotFound();
             }
 
+        }
+    }
+
+    public boolean processChange(int totalPrice, int money) {
+        if (money >= totalPrice) {
+            System.out.println("Kembailan: " + (money - totalPrice));
+            return false;
+        } else {
+            System.out.println("Uang tidak cukup");
+            return true;
         }
     }
 

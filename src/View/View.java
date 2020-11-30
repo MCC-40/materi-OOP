@@ -56,7 +56,7 @@ public class View {
         System.out.print("Masukan harga baru: ");
     }
 
-    public static void showTransaction(Map<String, Integer> basket) {
+    public static int showTransaction(Map<String, Integer> basket) {
         int totalPrice = 0;
         System.out.println("\n");
         for (Map.Entry element : basket.entrySet()) {
@@ -65,5 +65,7 @@ public class View {
         }
         System.out.println("--------------------------------");
         System.out.println("Total: \t\t" + totalPrice + "\n\n");
+        System.out.print("Jumlah uang: ");
+        return totalPrice;
     }
 }
