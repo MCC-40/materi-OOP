@@ -20,13 +20,4 @@ public class AtmCard extends BankAccount{
         return cardPin == pin;
     }
 
-    public void setAtmPin(int oldPin, int newPin) {
-        if (oldPin == cardPin)
-        {
-            cardPin = newPin;
-            System.out.print("atm pin succesfully changed");
-        } else {
-            System.out.print("old pin is incorrect");
-        }
-    }
 }

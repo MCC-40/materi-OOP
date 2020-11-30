@@ -50,7 +50,6 @@ public class BankAccount implements IBankAccount {
         this.balance = balance;
     }
     
-    @Override
     public void addBalance(long amount) {
         this.balance += amount;
     }
