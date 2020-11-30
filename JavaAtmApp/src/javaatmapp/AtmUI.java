@@ -4,22 +4,24 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class AtmInterface {
+
+/**
+ * ATM User Interface Class
+ * @author Mochamad Yusuf
+ */
+public class AtmUI implements IAtmUI, ITransactionConsole {
 
     AtmCard activeCard;
-    final int moneyUnit = 50000;
+    private final int MONEY_UNIT = 50000;
     public static final NumberFormat CURRENCY_FORMATTER = NumberFormat.getInstance(new Locale("id", "ID"));
 
+    @Override
     public void insertCard() {
         newWindow();
 
         String accountId = requestStringInput("Card id: ");
-        try {
-            activeCard = (AtmCard) JavaAtmApp.findCard(accountId);
-        } catch (ClassCastException  cce) {
-            activeCard = null;
-            showMessage("The bank account may not have an ATM card");
-        }
+        activeCard = JavaAtmApp.findCard(accountId);
+        
         if (activeCard == null) {
             showMessage("Invalid card id");
             insertCard();
@@ -36,10 +38,11 @@ public class AtmInterface {
             showMessage("Your ATM card is blocked");
         } else {
             showMessage("Pin Correct");
-            showAtmMenu();
+            showMainMenu();
         }
     }
 
+    @Override
     public void reinsertCard() {
         newWindow();
         showMessage("New transaction?");
@@ -61,8 +64,15 @@ public class AtmInterface {
                 break;
         }
     }
-
-    public void showAtmMenu() {
+    
+    @Override
+    public void ejectCard() {
+        showMessage("Card ejected");
+        reinsertCard();
+    }
+    
+    @Override
+    public void showMainMenu() {
         newWindow();
         showMessage("1. Balance info");
         showMessage("2. Withdraw");
@@ -88,35 +98,32 @@ public class AtmInterface {
                 break;
             default:
                 showMessage("Invalid option");
-                showAtmMenu();
+                showMainMenu();
                 break;
         }
     }
 
-    public void ejectCard() {
-        showMessage("Card ejected");
-        reinsertCard();
-    }
-
+    @Override
     public void showBalanceMenu() {
         newWindow();
         showMessage("Your balance: Rp " + CURRENCY_FORMATTER.format(activeCard.getBalance()) + ",-");
         reinsertCard();
     }
 
+    @Override
     public void showWithdrawMenu() {
         newWindow();
         showMessage("Withdraw amount must be in multiples of Rp"
-                + CURRENCY_FORMATTER.format(moneyUnit) + ",-");
+                + CURRENCY_FORMATTER.format(MONEY_UNIT) + ",-");
         int amount = requestNumberInput("Withdraw: ");
         newWindow();
-        if (amount % moneyUnit != 0) {
+        if (amount % MONEY_UNIT != 0) {
             showMessage("Amount must be in multiples of Rp"
-                    + CURRENCY_FORMATTER.format(moneyUnit) + ",-");
+                    + CURRENCY_FORMATTER.format(MONEY_UNIT) + ",-");
             showMessage("Withdraw failed");
             reinsertCard();
         }
-        if (activeCard.withdraw(amount)) {
+        if (activeCard.withdraw(amount, this)) {
             showMessage("Withdraw succeed");
             showMessage("Rp " + CURRENCY_FORMATTER.format(amount) + ",- withdrawed");
             showMessage("Your balance: Rp " + CURRENCY_FORMATTER.format(activeCard.getBalance()) + ",-");
@@ -126,6 +133,7 @@ public class AtmInterface {
         reinsertCard();
     }
 
+    @Override
     public void showTransferMenu() {
         newWindow();
         String accountId = requestStringInput("Account ID: ");
@@ -147,7 +155,7 @@ public class AtmInterface {
             switch (input) {
                 case 1:
                     newWindow();
-                    if (activeCard.transferMoney(accountId, amount)) {
+                    if (activeCard.transferMoney(accountId, amount, this)) {
                         showMessage("Transaction Succeed");
                         newWindow();
                         
@@ -175,13 +183,14 @@ public class AtmInterface {
         reinsertCard();
     }
 
+    @Override
     public void showDepositMenu() {
         int amount = requestNumberInput("Money in machine: ");
         if (amount % 1000 != 0) {
             showMessage("Deposit failed");
             showMessage("Amount must be in multiples of Rp 1.000,-");
         } else {
-            activeCard.deposit(amount);
+            activeCard.deposit(amount, this);
             showMessage("Deposit succeed");
             showMessage("Rp " + CURRENCY_FORMATTER.format(amount) + ",- deposited");
             showMessage("Your balance: Rp " + CURRENCY_FORMATTER.format(activeCard.getBalance()) + ",-");
@@ -189,26 +198,26 @@ public class AtmInterface {
         reinsertCard();
     }
 
-    public static void showErrorMessage(String message) {
-        System.out.println(message);
-    }
-
-    public static void newWindow() {
+    @Override
+    public void newWindow() {
         System.out.println("\n-------------------\n");
     }
 
-    public static void showMessage(String message) {
+    @Override
+    public void showMessage(String message) {
         System.out.println(message);
     }
-
-    public static int requestNumberInput(String message) {
+    
+    @Override
+    public int requestNumberInput(String message) {
         System.out.print(message);
         Scanner myObj = new Scanner(System.in);
         int input = myObj.nextInt();
         return input;
     }
 
-    public static String requestStringInput(String message) {
+    @Override
+    public String requestStringInput(String message) {
         System.out.print(message);
         Scanner myObj = new Scanner(System.in);
         String input = myObj.nextLine();

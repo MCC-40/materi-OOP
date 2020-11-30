@@ -6,7 +6,7 @@
 package javaatmapp;
 
 /**
- *
+ * Bank Account Class
  * @author Mochamad Yusuf
  */
 public class BankAccount implements IBankAccount {
@@ -14,6 +14,8 @@ public class BankAccount implements IBankAccount {
     private String accountId;
     private String accountName;
     private long balance;
+    
+    public BankAccount() { };
 
     public BankAccount(String accountId, String accountName, long balance) {
         this.accountId = accountId;
@@ -50,28 +52,29 @@ public class BankAccount implements IBankAccount {
         this.balance = balance;
     }
     
+    @Override
     public void addBalance(long amount) {
         this.balance += amount;
     }
 
 
     @Override
-    public boolean transferMoney(String accountId, int amount) {
-        IBankAccount targetAccount = JavaAtmApp.findAccountList(accountId);
+    public boolean transferMoney(String accountId, int amount, ITransactionConsole console) {
+        IBankAccount targetAccount = JavaAtmApp.findBankAccount(accountId);
         if (amount + minimalBalance > balance)
         {
-            AtmInterface.showMessage("Transaction Failed: Insufficient Balance");
-            AtmInterface.showMessage("Minimal balance is Rp " + AtmInterface.CURRENCY_FORMATTER.format(minimalBalance) + ",-");
+            console.showMessage("Transaction Failed: Insufficient Balance");
+            console.showMessage("Minimal balance is Rp " + AtmUI.CURRENCY_FORMATTER.format(minimalBalance) + ",-");
             return false;
         }
         
         if (targetAccount == null){
-            AtmInterface.showMessage("Transaction Failed: Account not exist");
+            console.showMessage("Transaction Failed: Account not exist");
             return false;
         }
         
         if (targetAccount == this){
-            AtmInterface.showMessage("Transaction Failed: Cannot transfer to yourself");
+            console.showMessage("Transaction Failed: Cannot transfer to yourself");
             return false;
         }
         
@@ -85,19 +88,19 @@ public class BankAccount implements IBankAccount {
     }
 
     @Override
-    public boolean withdraw(int amount) {
+    public boolean withdraw(int amount, ITransactionConsole console) {
         if (amount + minimalBalance < balance){
             balance -= amount;
             return true;
         }
         else{
-            AtmInterface.showMessage("Insufficient balance");
+            console.showMessage("Insufficient balance");
             return false;
         }
     }
 
     @Override
-    public void deposit(int amount) {
+    public void deposit(int amount, ITransactionConsole console) {
         balance += amount;
     }
 
